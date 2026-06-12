@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Миссия: Последний холостяк</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0a0f0a;
+      color: #00ff88;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px 16px;
+      margin: 0;
+    }
+    .terminal {
+      width: 100%;
+      max-width: 500px;
+      background: #0d1a0d;
+      border: 2px solid #00ff88;
+      border-radius: 12px;
+      padding: 24px 20px;
+      box-shadow: 0 0 20px rgba(0,255,136,0.2);
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+    }
+    h1, h2 {
+      text-align: center;
+      font-weight: normal;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 24px;
+      word-break: break-word;
+    }
+    .level-info {
+      font-size: 0.9rem;
+      color: #00ff88;
+      margin-bottom: 10px;
+      opacity: 0.7;
+    }
+    .task-box {
+      background: #00000033;
+      border: 1px dashed #00ff88;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+      font-size: 1rem;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .task-box a {
+      color: #ffcc00;
+      text-decoration: underline;
+    }
+    .task-box img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin: 12px 0;
+      border: 1px solid #00ff88;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    input {
+      background: #0d1a0d;
+      border: 1px solid #00ff88;
+      color: #00ff88;
+      font-family: inherit;
+      font-size: 1.2rem;
+      padding: 14px 16px;
+      border-radius: 8px;
+      text-align: center;
+      outline: none;
+      letter-spacing: 2px;
+    }
+    input::placeholder {
+      color: #00ff8855;
+    }
+    button {
+      background: #00ff88;
+      color: #0a0f0a;
+      border: none;
+      font-family: inherit;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      padding: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:active {
+      background: #00cc66;
+    }
+    .error-message {
+      color: #ff4444;
+      text-align: center;
+      margin-top: 8px;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .final-message {
+      text-align: center;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .footer {
+      margin-top: auto;
+      font-size: 0.7rem;
+      text-align: center;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal" id="app">
+    <!-- Динамическое содержимое будет здесь -->
+  </div>
+
+  <script>
+    // ===================== НАСТРОЙКИ КВЕСТА =====================
+    // Замени данные ниже на свои: коды, текст заданий, ссылки, картинки.
+    // Можно добавлять или удалять уровни, соблюдая структуру.
+    // Поле final: true только у последнего уровня – после него покажется финишный экран.
+
+    const levels = [
+      {
+        title: "МИССИЯ «ПОСЛЕДНИЙ ХОЛОСТОЙ»",
+        task: "Введите идентификационный код — самую важную дату в формате ДДММГГ.",
+        code: "1",   // ← ЗАМЕНИТЬ: дата свадьбы (ДДММГГ)
+        hint: "",
+        image: null         // можно оставить null или вставить URL картинки
+      },
+      {
+        title: "Задание 1. Место силы",
+        task: "Отправляйтесь туда, где всё началось: место знакомства или предложения. Найди там табличку с названием заведения / улицы / парка. Введи это название латиницей строчными буквами.",
+        code: "1", // ← ЗАМЕНИТЬ: название заведения/улицы латиницей
+        hint: "",
+        image: null
+      },
+      {
+        title: "Задание 2. Книжный шифр",
+        task: "Найди книжный магазин «Буквоед» (ул. Ленина, 5). На полке «Романтика» лежит книга «Алые паруса». Открой 44-ю страницу, пятая строка, второе слово — это код. Введи его.",
+        code: "1", // ← ЗАМЕНИТЬ: слово с 44-й страницы (латиницей, строчными)
+        hint: "Слово из 11 букв, значит «приключение»",
+        image: null
+      },
+      {
+        title: "Задание 3. Городской ориентир",
+        task: "Прибудь к памятнику «Основателям города». На постаменте выбит год римскими цифрами: MCMXCVIII. Переведи в арабские и введи ниже.",
+        code: "1",        // ← ЗАМЕНИТЬ: год арабскими цифрами
+        hint: "",
+        image: null
+      },
+      {
+        title: "Задание 4. Секретный схрон",
+        task: "В багажнике твоей машины лежит металлодетектор. Отправляйся в парк «Сосновка» (координаты: 59.9343, 30.3351). На месте в радиусе 10 метров от точки под землёй спрятан металлический контейнер с кодом. Найди, откопай и введи слово из контейнера.",
+        code: "1",     // ← ЗАМЕНИТЬ: код из контейнера
+        hint: "Можешь воспользоваться картой: <a href='https://go.2gis.com/wl276' target='_blank'>открыть карту</a>",
+        image: null
+      },
+      {
+        title: "Задание 5. Перехват на трассе",
+        task: "Двигайся по трассе в сторону посёлка Лесное. На 12-м километре, на жёлтом километровом столбе, закреплён чёрный контейнер со следующим кодом. Найди его и введи слово.",
+        code: "1",    // ← ЗАМЕНИТЬ: код из контейнера на столбе
+        hint: "Ориентир: рядом бетонный указатель «Лесное 3 км».",
+        image: null
+      },
+      {
+        title: "Задание 6. Поиск машины — Финиш",
+        task: "Твои друзья спрятали машину в районе Берёзового. На стекле надпись «Жених, тормози!». Под дворниками лежит бумажка с новым номером. Найди машину и введи номер (две цифры, которые нарисованы).",
+        code: "77",          // ← ЗАМЕНИТЬ: нарисованный номер (только цифры)
+        hint: "Подсказка: ищи возле старой водонапорной башни. <br><img src='17ce39a4b3ae3e10c1476960a690759d.jpg' alt='Подсказка'>",
+        image: null,         // можешь указать URL реального фото машины или ориентира
+        final: true,         // последний уровень – после него финишный экран
+        finalMessage: "МИССИЯ ВЫПОЛНЕНА!<br><br>Ты прошёл все испытания, агент.<br>Отправляйся по адресу:<br><strong>ул. Лесная, д. 10, банный комплекс «Угар»</strong><br><br>Шашлык, пиво и парилка ждут тебя!"
+      }
+    ];
+
+    // ===================== ЛОГИКА КВЕСТА (не трогай без необходимости) =====================
+    let currentLevel = 0;
+    const app = document.getElementById('app');
+
+    function render() {
+      const level = levels[currentLevel];
+      let html = '';
+
+      // Если уровень финальный и уже пройден — показываем финишный экран
+      if (level.final && currentLevel === levels.length - 1 && level.code === '_done_') {
+        html = `
+          <div class="final-message">
+            <h2>${level.finalMessage.split('<br><br>')[0] || ''}</h2>
+            <p>${level.finalMessage}</p>
+          </div>
+        `;
+        app.innerHTML = html;
+        return;
+      }
+
+      // Обычный уровень
+      html += `<div class="level-info">Уровень ${currentLevel + 1} из ${levels.length}</div>`;
+      html += `<h2>${level.title}</h2>`;
+      html += `<div class="task-box">`;
+      html += `<p>${level.task}</p>`;
+      if (level.image) {
+        html += `<img src="${level.image}" alt="Подсказка">`;
+      }
+      if (level.hint) {
+        html += `<p style="margin-top:12px; font-size:0.9rem; opacity:0.8;">${level.hint}</p>`;
+      }
+      html += `</div>`;
+
+      html += `
+        <div class="input-group">
+          <input type="text" id="codeInput" placeholder="Введи код" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <button id="submitBtn">Проверить</button>
+          <div id="errorMsg" class="error-message">Неверный код, агент. Попробуй ещё раз.</div>
+        </div>
+      `;
+      html += `<div class="footer">МИССИЯ АКТИВНА • ПОМОЩЬ БЛИЗКА</div>`;
+
+      app.innerHTML = html;
+
+      // Обработчики
+      const input = document.getElementById('codeInput');
+      const btn = document.getElementById('submitBtn');
+      const error = document.getElementById('errorMsg');
+
+      function check() {
+        const userCode = input.value.trim().toLowerCase();
+        const required = level.code.toLowerCase();
+        if (userCode === required) {
+          if (level.final) {
+            // Помечаем финальный уровень пройденным и показываем финиш
+            level.code = '_done_';
+            render();
+          } else {
+            currentLevel++;
+            render();
+          }
+        } else {
+          error.style.display = 'block';
+          input.classList.add('error-shake');
+          setTimeout(() => {
+            error.style.display = 'none';
+            input.classList.remove('error-shake');
+          }, 2000);
+        }
+      }
+
+      btn.addEventListener('click', check);
+      input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          check();
+        }
+      });
+
+      // Фокус на поле ввода
+      input.focus();
+    }
+
+    // Небольшая анимация ошибки (добавим класс)
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+      .error-shake {
+        animation: shake 0.3s ease-in-out;
+        border-color: #ff4444 !important;
+      }
+      @keyframes shake {
+        0%,100% { transform: translateX(0); }
+        25% { transform: translateX(-8px); }
+        75% { transform: translateX(8px); }
+      }
+    `;
+    document.head.appendChild(styleSheet);
+
+    // Запуск квеста
+    render();
+  </script>
+</body>
+</html>
